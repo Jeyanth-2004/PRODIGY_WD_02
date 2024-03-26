@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stopwatch</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+  }
+  #stopwatch {
+    font-size: 2em;
+    margin-bottom: 20px;
+  }
+  #lap-times {
+    font-size: 1.2em;
+  }
+  button {
+    font-size: 1em;
+    padding: 10px 20px;
+    margin: 0 10px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<div id="stopwatch">00:00:00</div>
+<button onclick="startStop()">Start</button>
+<button onclick="pauseResume()">Pause</button>
+<button onclick="reset()">Reset</button>
+<div id="lap-times"></div>
+
+<script>
+  let timer; 
+  let startTime; 
+  let pausedTime = 0; 
+  let running = false; 
+  let lapTimes = []; 
+
+  function startStop() {
+    if (!running) {
+      startTime = Date.now() - pausedTime;
+      timer = setInterval(updateTime, 10);
+      running = true;
+    } else {
+      clearInterval(timer);
+      running = false;
+    }
+  }
+
+  function pauseResume() {
+    if (running) {
+      clearInterval(timer);
+      pausedTime = Date.now() - startTime;
+      running = false;
+    } else {
+      startTime = Date.now() - pausedTime;
+      timer = setInterval(updateTime, 10);
+      running = true;
+    }
+  }
+
+  function reset() {
+    clearInterval(timer);
+    running = false;
+    pausedTime = 0;
+    displayTime(0);
+    lapTimes = [];
+    displayLapTimes();
+  }
+
+  function updateTime() {
+    const currentTime = Date.now();
+    const elapsedTime = currentTime - startTime;
+    displayTime(elapsedTime);
+  }
+
+  function displayTime(elapsedTime) {
+    const formattedTime = new Date(elapsedTime).toISOString().substr(11, 8);
+    document.getElementById('stopwatch').textContent = formattedTime;
+  }
+
+  function lap() {
+    const lapTime = Date.now() - startTime - pausedTime;
+    lapTimes.push(lapTime);
+    displayLapTimes();
+  }
+
+  function displayLapTimes() {
+    const lapTimesContainer = document.getElementById('lap-times');
+    lapTimesContainer.innerHTML = '';
+    lapTimes.forEach((lapTime, index) => {
+      const lapTimeDisplay = new Date(lapTime).toISOString().substr(11, 8);
+      lapTimesContainer.innerHTML += `Lap ${index + 1}: ${lapTimeDisplay}<br>`;
+    });
+  }
+</script>
+
+</body>
+</html>
